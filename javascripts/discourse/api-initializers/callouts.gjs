@@ -103,14 +103,22 @@ class QuoteCallouts {
       };
     });
 
-    api.modifyClass("model:topic", (Superclass) => {
-      return class extends Superclass {
-        @computed("excerpt")
-        get escapedExcerpt() {
-          return super.escapedExcerpt?.replace(CALLOUT_EXCERPT_REGEX, "");
-        }
-      };
-    });
+    const hasTransformer = api.registerValueTransformer(
+      "topic-escaped-excerpt",
+      ({ value }) => value?.replace(CALLOUT_EXCERPT_REGEX, "")
+    );
+
+    // Fallback for Discourse < 2026.8
+    if (!hasTransformer) {
+      api.modifyClass("model:topic", (Superclass) => {
+        return class extends Superclass {
+          @computed("excerpt")
+          get escapedExcerpt() {
+            return super.escapedExcerpt?.replace(CALLOUT_EXCERPT_REGEX, "");
+          }
+        };
+      });
+    }
 
     // Strips callout marker only on collapsed quote (see PostQuotedContent)
     api.modifyClass("component:post/cooked-html", (Superclass) => {
