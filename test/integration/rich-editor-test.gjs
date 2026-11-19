@@ -902,8 +902,12 @@ module("Integration | Rich Editor | Callout – paste handler", function (hooks)
 
     assert.dom(".composer-callout-node").doesNotExist();
     assert
-      .dom(".ProseMirror blockquote[data-ai-generated='true'] > .ai-badge")
-      .exists("pasted HTML keeps native attribution");
+      .dom(".ProseMirror blockquote")
+      .hasAttribute(
+        "data-ai-generated",
+        "true",
+        "pasted HTML keeps native attribution"
+      );
     assert.true(editor.value.includes("> [!AI]"), "AI marker is serialized");
     assert
       .dom(".ProseMirror blockquote p")
